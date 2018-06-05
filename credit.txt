@@ -1,0 +1,58 @@
+﻿--------------------------------------------------------------------
+---------------------------BOVAGNET Mathieu-------------------------
+-----------------------------Site internet--------------------------
+--------------------------------------------------------------------
+Ressources :
+
+
+Mot de passe sur le site internet : 
+
+	<form>
+    <label for="pswd">Mot de passe requis : </label>
+    <input type="password" id="pswd">
+    <input type="button" value="Lire" onclick="checkPswd();" />
+	</form>
+	<!--Function to check password the already set password is admin-->
+	<script type="text/javascript">
+    function checkPswd() {
+        var confirmPassword = "9Xd5rtYE";
+        var password = document.getElementById("pswd").value;
+        if (password == confirmPassword) {
+             window.location="2.html";
+        }
+        else{
+            alert("Mot de passe non valide.");
+        }
+    }
+	</script>
+	
+	
+	
+	
+	
+	
+A faire :
+
+Stockage des mots de passes :
+CV : 9Xd5rtYEA
+Script de veille technologique : 9Xd5rtYEI
+Document Tir : 9Xd5rtYEP
+Cargo : 9Xd5rtYE
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+Page de crédit:
+
+Ressource code : 
+W3School - Quelques lignes de code.
