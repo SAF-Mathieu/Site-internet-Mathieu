@@ -1,0 +1,91 @@
+﻿<p>
+
+param (  </br>
+    $localPath = "C:\Applications\....\CNT\ERR-ACQ\",									  </br>
+    $remotePath = "/",																						</br>
+    $fileName = "FVL_ERR_ENV*.*",																			</br>
+    $fileName2 = "FVL_ERR_N2_ENV*.*",																		</br>
+	$date = (Get-Date),																						</br>
+	$date_jour = (Get-Date -UFormat %d),																	</br>
+ 	$date_mois = (Get-Date -UFormat %m),																	</br>
+	$date_annee = (Get-Date -UFormat %y)																	</br>
+	)  </br>
+try {  </br>
+    Add-Type -Path "C:\Program Files (x86)\WinSCP\WinSCPnet.dll"	  </br>
+    $sessionOptions = New-Object WinSCP.SessionOptions -Property @{											</br>
+    Protocol = [WinSCP.Protocol]::Ftp																		</br>
+    HostName = "*IP*"																				        </br>
+    PortNumber = *PORT*																						</br>
+    UserName = "*ID*"																					    </br>
+    Password = "*MDP*"																					    </br>
+	}																										</br>
+    $session = New-Object WinSCP.Session  </br>
+	try{  </br>
+        $session.Open($sessionOptions)																		</br>
+        $transferOptions = New-Object WinSCP.TransferOptions												</br>
+        $transferOptions.TransferMode = [WinSCP.TransferMode]::Binary										</br>
+        $directoryInfo = $session.ListDirectory($remotePath)  </br>
+        $latest =																							</br>
+            $directoryInfo.Files |  </br>
+            <#Where-Object { -Not $_.IsDirectory } |#>  </br>
+			Where-Object -FilterScript { $_ -like $fileName -Or $_ -like $fileName2 } |						</br>
+            Sort-Object LastWriteTime -Descending |															</br>
+            Select-Object -First 1         
+		write-host ""																						  </br>	
+		write-host ""																						  </br>
+		write-host "------------------------------------------------------------"							  </br>
+		write-host "|Dernier fichier : "$latest" | "														  </br>	
+		write-host "|Derniere modification : "$DerniereModification" | "									  </br>
+		write-host "------------------------------------------------------------"							  </br>
+		$DerniereModification = ($latest).LastWriteTime														  </br>
+		<#VARIABLE DE DATE MODIFICATION #>                          										  </br>
+		$JourDernieremodification = $DerniereModification.ToString("dd")     								  </br>
+		$DateDernieremodification_jour = Get-Date -UFormat %d  $DerniereModification        				   </br>
+		$DateDernieremodification_mois = Get-Date -UFormat %m  $DerniereModification       					  </br>
+		$DateDernieremodification_annee = Get-Date -UFormat %y  $DerniereModification       				  </br>
+		$NBdeJourDepuisLeDebutDeAnnee = (get-date).dayofyear                               					  </br>
+		$NBdeJourDepuisLeDebutDeAnneeMoins1 = $NBdeJourDepuisLeDebutDeAnnee - 1            					    </br>
+		<#VARIABLE DE DATE MODIFICATION #>  </br>
+		write-host "------------------------------------------------------------"							  </br>
+		write-host "| Le fichier a ete modifie pour la derniere fois le : "$JourDernieremodification " | "	  </br>
+		write-host "| Aujourd'hui, nous somme le : "$date_jour "                        | "					  </br>
+		write-host "------------------------------------------------------------"							  </br>
+		write-host ""																						  </br>
+		write-host ""																						  </br>			
+			if ($JourDernieremodification -eq $date_jour){													  </br> 													
+			write-host "Date du jour de la dernière modification du fichier : "$JourDernieremodification	  </br>
+			write-host "Aujourd'hui : "$date_jour															  </br>
+			write-host "Le fichier est téléchargé"															  </br>
+			$transferResult = $session.GetFiles($latest, $localPath, $False, $transferOptions)				  </br>
+			$EmailFrom = "mathieu.bovagnet@cargo.fr" 														  </br>
+			$EmailTo = "mathieu.bovagnet@cargo.fr" 										     				  </br>
+			$Subject = "Télechargement - Serveur FTP" 														  </br>
+			$Body = "Un fichier d'erreur a ete telecharge. Il est trouvable au chemin suivant :...."          </br>
+			$SMTPServer = "*SERVEUR*" 																          </br>
+			$SMTPClient = New-Object Net.Mail.SmtpClient($SmtpServer, 587)									  </br>
+			$SMTPClient.EnableSsl = $true																	  </br>
+			$SMTPClient.Credentials = New-Object System.Net.NetworkCredential("ID", "MDP");                   </br>
+			$SMTPClient.Send($EmailFrom, $EmailTo, $Subject, $Body)											  </br>
+			}	  </br>
+		}  </br>
+	finally{  </br>
+        $session.Dispose()																								      </br>
+	}  																														  </br>
+    exit 1 																													  </br>
+}	  																														  </br>
+catch{ 																														  </br>
+    Write-Host "Error: $($_.Exception.Message)"																				  </br>
+			#Envoi de mail en cas d'erreur de connexion au FTP  														  	  </br>
+			$EmailFrom = "mathieu.bovagnet@cargo.fr" 																		  </br>
+			$EmailTo = "mathieu.bovagnet@cargo.fr"						 										 	    	  </br>
+			$Subject = "Erreur - Serveur FTP" 																				  </br>
+			$Body = "Ceci est la message : erreur envoye par mail suite à une erreur lors de la connexion au serveur FTP"	  </br>
+			$SMTPServer = "SERVEUR"         																				  </br>
+			$SMTPClient = New-Object Net.Mail.SmtpClient($SmtpServer, 587)													  </br>
+			$SMTPClient.EnableSsl = $true																					  </br>
+			$SMTPClient.Credentials = New-Object System.Net.NetworkCredential("ID", "MDP");									  </br>
+			$SMTPClient.Send($EmailFrom, $EmailTo, $Subject, $Body)															  </br>
+
+    exit 0
+}
+</p>

@@ -38,6 +38,8 @@ CV : 9Xd5rtYEA
 Script de veille technologique : 9Xd5rtYEI
 Document Tir : 9Xd5rtYEP
 Cargo : 9Xd5rtYE
+Documentation NTFS : 9Xd5rjHytD
+Documentation DHCP : 9Xd6psHiUO
 	
 	
 	
@@ -56,3 +58,5 @@ Page de crédit:
 
 Ressource code : 
 W3School - Quelques lignes de code.
+
+Procédure NTFS : 9Xd5rjHytD
